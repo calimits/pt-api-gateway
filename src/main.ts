@@ -22,6 +22,7 @@ async function bootstrap() {
       legacyHeaders: false, 
     }),
   );
+  
 
   app.use(cookieparser());
   await app.listen(process.env.PORT ?? 3000);
