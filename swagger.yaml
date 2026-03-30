@@ -1,0 +1,279 @@
+openapi: 3.0.0
+info:
+  title: User Service API
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+    description: Local Server
+paths:
+  /api/v1/accounts/:
+    get:
+      summary: Endpoint for getting 20 random operations
+      parameters:
+        - in: header
+          name: Authorization
+          required: true
+          schema:
+            type: string
+          description: >
+            Bearer token.
+            Example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+      responses:
+        '200':
+          content: 
+            application/json: 
+              schema:
+                $ref: '#/components/schemas/AccountsArray'
+        '500':
+          content: 
+            application/json: 
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/v1/transactions/:
+    get:
+      summary: Endpoint for getting 20 random accounts
+      parameters:
+        - in: header
+          name: Authorization
+          required: true
+          schema:
+            type: string
+          description: >
+            Bearer token.
+            Example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+      responses:
+        '200':
+          content: 
+            application/json: 
+              schema:
+                $ref: '#/components/schemas/TransactionsArray'
+        '401':
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/Error'
+        '500':
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/Error'
+  
+  /api/v1/logout/{id}:
+    get:
+      summary: Endpoint for logout a user
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content: 
+            application/json: 
+              schema:
+                $ref: '#/components/schemas/code200'
+        '500':
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/Error'
+
+  /api/v1/register/:
+    post:
+      summary: Endpoint for register a user
+      requestBody:
+        description: User email and password
+        required: true
+        content: 
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserDto'
+      responses:
+        '200':
+          content: 
+            application/json: 
+              schema:
+                $ref: '#/components/schemas/UserDto'
+        '401':
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/Error'
+        '500':
+          content: 
+            application/json: 
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /api/v1/login/:
+    post:
+      summary: Endpoint for login a user
+      requestBody:
+        description: User email and password
+        required: true
+        content: 
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserDto'
+      responses:
+        '200':
+          headers:
+            Set-Cookie:
+              description: >
+                refresh_token cookie. Example: `refresh_token=abc123; HttpOnly; Path=/; Secure`
+              schema:
+                type: string
+          content: 
+            application/json: 
+              schema:
+                $ref: '#/components/schemas/LoggedResDto'
+        '500':
+          content: 
+            application/json: 
+              schema:
+                $ref: '#/components/schemas/Error'
+
+
+  /api/v1/refresh-tokens/:
+    post:
+      summary: Endpoint for refreshing user tokens
+      parameters:
+        - in: cookie
+          name: refresh_token
+          required: true
+          schema:
+            type: string
+          description: >
+            Example: `refresh_token=abc123; HttpOnly; Path=/; Secure`
+
+      responses:
+        '200':
+          headers:
+            Set-Cookie:
+              description: >
+                refresh_token cookie. Example: `refresh_token=abc123; HttpOnly; Path=/; Secure`
+              schema:
+                type: string
+          content: 
+            application/json: 
+              schema:
+                $ref: '#/components/schemas/AccessToken'
+        '500':
+          content: 
+            application/json: 
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    AccessToken:
+      type: object
+      properties:
+        token: string
+      example: 
+        token: aljsdhlasjhdaljsdhalksdhlaskhdal
+    UserDto:
+      type: object
+      properties:
+        email:
+          type: string
+        id:
+          type: number
+      example: 
+        email: calimits@gmail.com
+        id: 1
+    CreateUserDto:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+      example: 
+        email: calimits@gmail.com
+        password: C4limits*324
+    AccountDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+        accountNumber:
+          type: string
+        holderName:
+          type: string
+      example:
+        uuid: "123e4567-e89b-12d3-a456-426614174000"
+        accountNumber: "9876543210"
+        holderName: "Juan Pérez"
+    
+    LoggedResDto:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          description: Access token
+        userInfo:
+          $ref: '#/components/schemas/UserDto'
+      example:
+        accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        userInfo:
+          id: 1
+          email: "usur@example.com"
+
+    AccountsArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/AccountDto'
+      example:
+        - uuid: "123e4567-e89b-12d3-a456-426614174000"
+          accountNumber: "9876543210"
+          holderName: "Juan Pérez"
+        - uuid: "223e4567-e89b-12d3-a456-426614174001"
+          accountNumber: "1234567890"
+          holderName: "María Gómez"
+
+    TransactionDto:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date-time   
+        operation:
+          type: string
+        amount:
+          type: string
+      example:
+        date: "2026-03-29T21:10:00Z"
+        operation: "deposit"
+        amount: "1500.00"
+
+    TransactionsArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/TransactionDto'
+      example:
+        - date: "2026-03-29T21:10:00Z"
+          operation: "deposit"
+          amount: "1500.00"
+        - date: "2026-03-30T10:45:00Z"
+          operation: "withdrawal"
+          amount: "500.00"
+
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+      example: 
+        message: "Error message"
+    
+    code200:
+      type: object
+      properties:
+        message:
+          type: string
+      example: 
+        message: "Succesfull"
+    
