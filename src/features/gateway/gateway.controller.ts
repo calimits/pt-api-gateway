@@ -83,8 +83,6 @@ export class GatewayController {
   @Get("accounts")
   async getAccounts(@Headers("Authorization") authHeader: string): Promise<AccountDto[]> {
     try {
-      console.log("se ejecuta")
-      console.log(authHeader)
       const accessToken: string = authHeader.split(" ")[1].replace(/"/g, "")
       const accounts: AccountDto[] = await this.financesServiceClient.getAccounts(accessToken);
       return accounts;
