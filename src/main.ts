@@ -9,7 +9,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const swaggerDocument = YAML.load(path.join(__dirname, "../swagger.yaml"));
   app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
+  console.log(process.env.AUTH_SERVICE_URL);
   app.use(cookieparser());
   await app.listen(process.env.PORT ?? 3000);
 }
