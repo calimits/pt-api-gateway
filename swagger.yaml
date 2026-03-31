@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  title: User Service API
+  title: API Gateway
   version: 1.0.0
 servers:
   - url: https://pt-api-gateway-production.up.railway.app/
